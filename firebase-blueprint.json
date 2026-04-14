@@ -1,0 +1,86 @@
+{
+  "entities": {
+    "Project": {
+      "title": "Project",
+      "description": "A portfolio project",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "tech": { "type": "string" },
+        "desc": { "type": "string" },
+        "live": { "type": "string" },
+        "github": { "type": "string" },
+        "order": { "type": "number" }
+      },
+      "required": ["title", "tech", "desc", "order"]
+    },
+    "Skill": {
+      "title": "Skill",
+      "description": "A technical skill",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "category": { "type": "string", "enum": ["frontend", "backend", "databases", "tools"] },
+        "order": { "type": "number" }
+      },
+      "required": ["name", "category", "order"]
+    },
+    "Experience": {
+      "title": "Experience",
+      "description": "A professional experience",
+      "type": "object",
+      "properties": {
+        "role": { "type": "string" },
+        "company": { "type": "string" },
+        "period": { "type": "string" },
+        "points": { "type": "array", "items": { "type": "string" } },
+        "order": { "type": "number" }
+      },
+      "required": ["role", "company", "period", "points", "order"]
+    },
+    "Service": {
+      "title": "Service",
+      "description": "A service package",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "price": { "type": "string" },
+        "order": { "type": "number" }
+      },
+      "required": ["title", "description", "price", "order"]
+    },
+    "Quote": {
+      "title": "Quote",
+      "description": "A motivational quote",
+      "type": "object",
+      "properties": {
+        "text": { "type": "string" },
+        "order": { "type": "number" }
+      },
+      "required": ["text", "order"]
+    }
+  },
+  "firestore": {
+    "/projects/{projectId}": {
+      "schema": "Project",
+      "description": "Portfolio projects"
+    },
+    "/skills/{skillId}": {
+      "schema": "Skill",
+      "description": "Technical skills"
+    },
+    "/experiences/{experienceId}": {
+      "schema": "Experience",
+      "description": "Professional experiences"
+    },
+    "/services/{serviceId}": {
+      "schema": "Service",
+      "description": "Service packages"
+    },
+    "/quotes/{quoteId}": {
+      "schema": "Quote",
+      "description": "Motivational quotes"
+    }
+  }
+}

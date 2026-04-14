@@ -1,0 +1,156 @@
+// ===============================================================
+// Assumed Data Model
+// ===============================================================
+//
+// Collection: projects
+// Document ID: auto-generated
+// Fields:
+//   - title: string (required)
+//   - tech: string (required)
+//   - desc: string (required)
+//   - live: string (optional)
+//   - github: string (optional)
+//   - order: number (required)
+//
+// Collection: skills
+// Document ID: auto-generated
+// Fields:
+//   - name: string (required)
+//   - category: string (required, enum: ['frontend', 'backend', 'databases', 'tools'])
+//   - order: number (required)
+//
+// Collection: experiences
+// Document ID: auto-generated
+// Fields:
+//   - role: string (required)
+//   - company: string (required)
+//   - period: string (required)
+//   - points: list of strings (required)
+//   - order: number (required)
+//
+// Collection: services
+// Document ID: auto-generated
+// Fields:
+//   - title: string (required)
+//   - description: string (required)
+//   - price: string (required)
+//   - order: number (required)
+//
+// Collection: quotes
+// Document ID: auto-generated
+// Fields:
+//   - text: string (required)
+//   - order: number (required)
+//
+// Collection: users
+// Document ID: auth.uid
+// Fields:
+//   - role: string (required, 'admin' or 'user')
+//   - email: string (required)
+//
+// ===============================================================
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (request.auth.token.email == "dellusr688@gmail.com" || 
+         (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'));
+    }
+
+    function isValidString(val, maxLen) {
+      return val is string && val.size() > 0 && val.size() <= maxLen;
+    }
+
+    function isValidList(val, maxSize) {
+      return val is list && val.size() <= maxSize;
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    function isValidProject(data) {
+      return data.keys().hasAll(['title', 'tech', 'desc', 'order']) &&
+             isValidString(data.title, 100) &&
+             isValidString(data.tech, 200) &&
+             isValidString(data.desc, 1000) &&
+             data.order is number;
+    }
+
+    function isValidSkill(data) {
+      return data.keys().hasAll(['name', 'category', 'order']) &&
+             isValidString(data.name, 50) &&
+             data.category in ['frontend', 'backend', 'databases', 'tools'] &&
+             data.order is number;
+    }
+
+    function isValidExperience(data) {
+      return data.keys().hasAll(['role', 'company', 'period', 'points', 'order']) &&
+             isValidString(data.role, 100) &&
+             isValidString(data.company, 100) &&
+             isValidString(data.period, 50) &&
+             isValidList(data.points, 10) &&
+             data.order is number;
+    }
+
+    function isValidService(data) {
+      return data.keys().hasAll(['title', 'description', 'price', 'order']) &&
+             isValidString(data.title, 100) &&
+             isValidString(data.description, 500) &&
+             isValidString(data.price, 50) &&
+             data.order is number;
+    }
+
+    function isValidQuote(data) {
+      return data.keys().hasAll(['text', 'order']) &&
+             isValidString(data.text, 500) &&
+             data.order is number;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isAuthenticated() && request.auth.uid == userId;
+      allow write: if isAdmin();
+    }
+
+    match /projects/{projectId} {
+      allow read: if true;
+      allow write: if isAdmin() && isValidProject(request.resource.data);
+    }
+
+    match /skills/{skillId} {
+      allow read: if true;
+      allow write: if isAdmin() && isValidSkill(request.resource.data);
+    }
+
+    match /experiences/{experienceId} {
+      allow read: if true;
+      allow write: if isAdmin() && isValidExperience(request.resource.data);
+    }
+
+    match /services/{serviceId} {
+      allow read: if true;
+      allow write: if isAdmin() && isValidService(request.resource.data);
+    }
+
+    match /quotes/{quoteId} {
+      allow read: if true;
+      allow write: if isAdmin() && isValidQuote(request.resource.data);
+    }
+  }
+}
