@@ -44,7 +44,7 @@ export const initialProjects = [
     title: "CampusIntern",
     tech: "PHP, SQLite, Bootstrap",
     desc: "Role-based internship management system with improved backend handling.",
-    live: "#",
+    live: "https://campusintern-4arv.onrender.com/auth/login.php",
     github: "https://github.com/campusintern87v/campusintern-v1.0.git"
   },
   {
