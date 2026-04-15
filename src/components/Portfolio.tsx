@@ -20,7 +20,9 @@ import {
   Globe,
   Zap,
   DollarSign,
-  MessageCircle
+  MessageCircle,
+  Menu,
+  X
 } from "lucide-react";
 
 import { initialProjects, initialSkills, initialExperiences, initialQuotes, initialServices, toolLogos } from "../constants";
@@ -51,6 +53,7 @@ function Portfolio() {
   const [servicesData, setServicesData] = useState<any[]>([]);
   const [quotesData, setQuotesData] = useState<any[]>([]);
   const [copied, setCopied] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     const unsubProjects = onSnapshot(query(collection(db, "projects"), orderBy("order")), (snap) => {
@@ -142,10 +145,15 @@ function Portfolio() {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           className="text-xl font-display font-bold tracking-tighter cursor-pointer"
-          onClick={() => setActiveSection("about")}
+          onClick={() => {
+            setActiveSection("about");
+            setIsMenuOpen(false);
+          }}
         >
           SHIVAM<span className="text-blue-500">.</span>
         </motion.div>
+
+        {/* Desktop Menu */}
         <div className="hidden md:flex gap-8 text-sm font-medium">
           {sections.map((item) => (
             <button 
@@ -165,6 +173,43 @@ function Portfolio() {
             </button>
           ))}
         </div>
+
+        {/* Mobile Menu Button */}
+        <button 
+          className="md:hidden text-white p-2"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+        >
+          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+
+        {/* Mobile Menu Overlay */}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="absolute top-full left-0 w-full bg-black/90 backdrop-blur-xl border-b border-white/10 md:hidden overflow-hidden"
+            >
+              <div className="flex flex-col p-6 gap-4">
+                {sections.map((item) => (
+                  <button 
+                    key={item} 
+                    onClick={() => {
+                      setActiveSection(item.toLowerCase());
+                      setIsMenuOpen(false);
+                    }}
+                    className={`text-left py-2 text-lg font-medium transition-colors ${
+                      activeSection === item.toLowerCase() ? "text-blue-500" : "text-white/60"
+                    }`}
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
       <main className="max-w-7xl mx-auto px-6 pt-32 pb-20 min-h-[80vh] flex flex-col justify-center">
